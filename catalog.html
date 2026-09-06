@@ -32,12 +32,41 @@
     </ul>
     <h1>Каталог меблів</h1>
   </div>
+<main class="container">
+    <!-- Панель фільтрів і сортування -->
+    <div class="catalog-controls">
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-filter="all">Всі</button>
+        <button class="filter-btn" data-filter="дивани">Дивани</button>
+        <button class="filter-btn" data-filter="ліжка">Ліжка</button>
+        <button class="filter-btn" data-filter="столи">Столи</button>
+        <button class="filter-btn" data-filter="крісла">Крісла</button>
+        <button class="filter-btn" data-filter="шафи">Шафи</button>
+        <button class="filter-btn" data-filter="тумби">Тумби</button>
+        <button class="filter-btn" data-filter="комоди">Комоди</button>
+        <button class="filter-btn" data-filter="стелажі">Стелажі</button>
+        <button class="filter-btn" data-filter="пуфи">Пуфи</button>
+      </div>
 
+      <select id="sort-select" class="sort-select">
+        <option value="default">За замовчуванням</option>
+        <option value="price-asc">Від дешевших до дорожчих</option>
+        <option value="price-desc">Від дорожчих до дешевших</option>
+        <option value="name-asc">За назвою (А-Я)</option>
+      </select>
+    </div>
+
+    <!-- Сітка товарів -->
+    <div class="product-grid">
+      <!-- Картки товарів -->
+    </div>
+  </main>
+  </main>
   <!-- Контент каталогу -->
   <main class="container catalog-page">
-    <div class="product-grid">
+   <div class="product-grid">
       
-      <!-- Диван Nordic -->
+      <!-- 1. Диван Nordic -->
       <article class="product-card">
         <div class="product-card__img" style="background-image: url('https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=500&q=80');"></div>
         <div class="product-card__info">
@@ -51,7 +80,7 @@
         </div>
       </article>
 
-      <!-- Ліжко Soft Sleep -->
+      <!-- 2. Ліжко Soft Sleep -->
       <article class="product-card">
         <div class="product-card__img" style="background-image: url('https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=500&q=80');"></div>
         <div class="product-card__info">
@@ -65,7 +94,7 @@
         </div>
       </article>
 
-      <!-- Стіл Oak Wood -->
+      <!-- 3. Стіл Oak Wood -->
       <article class="product-card">
         <div class="product-card__img" style="background-image: url('https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?auto=format&fit=crop&w=500&q=80');"></div>
         <div class="product-card__info">
@@ -79,6 +108,89 @@
         </div>
       </article>
 
+      <!-- 4. Крісло Lounge Comfort -->
+      <article class="product-card">
+        <div class="product-card__img" style="background-image: url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=500&q=80');"></div>
+        <div class="product-card__info">
+          <span class="category-tag">Крісла</span>
+          <h3>Крісло "Lounge Comfort"</h3>
+          <p class="specs">85 × 90 см • Тканина: Букле</p>
+          <div class="product-card__bottom">
+            <span class="price">9 400 грн</span>
+            <a href="product-chair.html" class="btn btn--sm">Детальніше</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 5. Шафа Loft Line -->
+      <article class="product-card">
+        <div class="product-card__img" style="background-image: url('https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=500&q=80');"></div>
+        <div class="product-card__info">
+          <span class="category-tag">Шафи</span>
+          <h3>Шафа-купе "Loft Line"</h3>
+          <p class="specs">200 × 240 × 60 см • ДСП + Дзеркало</p>
+          <div class="product-card__bottom">
+            <span class="price">19 600 грн</span>
+            <a href="product-wardrobe.html" class="btn btn--sm">Детальніше</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 6. Тумба Minimalist -->
+      <article class="product-card">
+        <div class="product-card__img" style="background-image: url('https://images.unsplash.com/photo-1532323544230-7191fd51bc1b?auto=format&fit=crop&w=500&q=80');"></div>
+        <div class="product-card__info">
+          <span class="category-tag">Тумби</span>
+          <h3>Приліжкова тумба "Minimalist"</h3>
+          <p class="specs">45 × 50 × 40 см • Натуральний шпон</p>
+          <div class="product-card__bottom">
+            <span class="price">3 200 грн</span>
+            <a href="product-nightstand.html" class="btn btn--sm">Детальніше</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 7. Комод Style Wood -->
+      <article class="product-card">
+        <div class="product-card__img" style="background-image: url('https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=500&q=80');"></div>
+        <div class="product-card__info">
+          <span class="category-tag">Комоди</span>
+          <h3>Комод "Style Wood"</h3>
+          <p class="specs">120 × 85 × 45 см • 4 шухляди</p>
+          <div class="product-card__bottom">
+            <span class="price">8 700 грн</span>
+            <a href="product-dresser.html" class="btn btn--sm">Детальніше</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 8. Стелаж Open Space -->
+      <article class="product-card">
+        <div class="product-card__img" style="background-image: url('https://images.unsplash.com/photo-1594620302200-9a762244a156?auto=format&fit=crop&w=500&q=80');"></div>
+        <div class="product-card__info">
+          <span class="category-tag">Стелажі</span>
+          <h3>Стелаж "Open Space"</h3>
+          <p class="specs">90 × 190 × 35 см • Метал + Дуб</p>
+          <div class="product-card__bottom">
+            <span class="price">6 500 грн</span>
+            <a href="product-shelf.html" class="btn btn--sm">Детальніше</a>
+          </div>
+        </div>
+      </article>
+      <!-- 9. Пуф Puff Soft -->
+      <!-- 9. Пуф Puff Soft -->
+      <article class="product-card">
+        <div class="product-card__img" style="background-image: url('https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=500&q=80');"></div>
+        <div class="product-card__info">
+          <span class="category-tag">Пуфи</span>
+          <h3>Пуф "Puff Soft"</h3>
+          <p class="specs">45 × 45 × 45 см • Тканина: Велюр</p>
+          <div class="product-card__bottom">
+            <span class="price">2 100 грн</span>
+            <a href="product-pouf.html" class="btn btn--sm">Детальніше</a>
+          </div>
+        </div>
+      </article>
     </div>
   </main>
 

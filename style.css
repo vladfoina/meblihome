@@ -826,3 +826,65 @@ body {
     text-align: center;
   }
 }
+/* --- КОМПАКТНІ КНОПКИ ФІЛЬТРІВ ТА СОРТУВАННЯ --- */
+/* --- ПАНЕЛЬ КЕРУВАННЯ --- */
+.catalog-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+/* Контейнер кнопок — вирівнювання в один рядок */
+.filter-buttons {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  flex-direction: row !important;
+  gap: 8px !important;
+  width: auto !important; /* Відміна розтягування на всю ширину */
+}
+
+/* Стилі самих кнопок */
+.filter-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: auto !important; /* Чітко за розміром тексту */
+  max-width: max-content;
+  padding: 6px 16px !important;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #374151;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap; /* Текст не переноситься */
+}
+
+.filter-btn:hover {
+  border-color: #111827;
+  background-color: #f3f4f6;
+}
+
+.filter-btn.active {
+  background-color: #111827 !important;
+  color: #ffffff !important;
+  border-color: #111827 !important;
+}
+
+/* Випадаючий список сортування */
+.sort-select {
+  padding: 8px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #ffffff;
+  font-size: 14px;
+  color: #374151;
+  outline: none;
+  cursor: pointer;
+  height: 38px;
+}

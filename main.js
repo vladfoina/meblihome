@@ -225,34 +225,71 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   }
-// Зміна головного фото при кліку на мініатюри (thumbs)
-    const mainImg = document.querySelector('.product-gallery__main');
-    const thumbs = document.querySelectorAll('.thumb');
 
-    thumbs.forEach(thumb => {
-      thumb.addEventListener('click', function() {
-        thumbs.forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-        const bgUrl = getComputedStyle(this).backgroundImage;
-        if (mainImg) mainImg.style.backgroundImage = bgUrl;
+  function initCatalogLogic() {
+    const grid = document.querySelector('.catalog-page .product-grid');
+    if (!grid) return;
+
+    const cards = Array.from(grid.querySelectorAll('.product-card'));
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const sortSelect = document.getElementById('sort-select');
+
+    function getPrice(card) {
+      const priceEl = card.querySelector('.price, .price-current');
+      return priceEl ? parseInt(priceEl.textContent.replace(/\D/g, ''), 10) || 0 : 0;
+    }
+
+    function getName(card) {
+      const titleEl = card.querySelector('h3, .product-card__title');
+      return titleEl ? titleEl.textContent.trim() : '';
+    }
+
+    function applyFiltersAndSort() {
+      const activeBtn = document.querySelector('.filter-btn.active');
+      const filterValue = activeBtn ? (activeBtn.getAttribute('data-filter') || 'all').toLowerCase() : 'all';
+      const sortValue = sortSelect ? sortSelect.value : 'default';
+
+      cards.forEach(card => {
+        const tag = card.querySelector('.category-tag');
+        const tagText = tag ? tag.textContent.toLowerCase() : '';
+        card.style.display = filterValue === 'all' || tagText.includes(filterValue) ? '' : 'none';
+      });
+
+      const visibleCards = cards.filter(card => card.style.display !== 'none');
+      visibleCards.sort((a, b) => {
+        if (sortValue === 'price-asc') return getPrice(a) - getPrice(b);
+        if (sortValue === 'price-desc') return getPrice(b) - getPrice(a);
+        if (sortValue === 'name-asc') return getName(a).localeCompare(getName(b), 'uk');
+        return 0;
+      });
+      visibleCards.forEach(card => grid.appendChild(card));
+    }
+
+    filterBtns.forEach(btn => {
+      if (btn.tagName === 'A') return;
+      btn.addEventListener('click', event => {
+        event.preventDefault();
+        filterBtns.forEach(filterBtn => filterBtn.classList.remove('active'));
+        btn.classList.add('active');
+        applyFiltersAndSort();
       });
     });
 
-    // ⬇️ ЗМІНА КОЛЬОРУ ТА ФОТО ТОВАРУ ПРИ КЛІКУ НА КНОПКИ КОЛЬОРУ ⬇️
-    const colorBtns = document.querySelectorAll('.color-btn');
-    colorBtns.forEach(btn => {
-      btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        // 1. Перемикаємо активний клас для кнопки
-        colorBtns.forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
+    if (sortSelect) sortSelect.addEventListener('change', applyFiltersAndSort);
 
-        // 2. Змінюємо фото товару, якщо вказано атрибут data-img
-        const newImgUrl = this.getAttribute('data-img');
-        if (newImgUrl && mainImg) {
-          mainImg.style.backgroundImage = `url('${newImgUrl}')`;
-        }
-      });
-    });
+    const categoryParam = new URLSearchParams(window.location.search).get('category');
+    if (categoryParam) {
+      const targetBtn = Array.from(filterBtns).find(btn =>
+        btn.getAttribute('data-filter')?.toLowerCase() === decodeURIComponent(categoryParam).toLowerCase()
+      );
+      if (targetBtn) {
+        filterBtns.forEach(filterBtn => filterBtn.classList.remove('active'));
+        targetBtn.classList.add('active');
+      }
+    }
+
+    applyFiltersAndSort();
+  }
+
+  initCatalogLogic();
 });

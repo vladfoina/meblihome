@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стелаж "Open Space" — MebliHome</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__wrapper">
+      <a href="index.html" class="logo">Mebli<span>Home</span></a>
+      <nav class="nav">
+        <a href="index.html">Головна</a>
+        <a href="catalog.html" class="active">Каталог</a>
+        <a href="#">Про нас</a>
+        <a href="#">Контакти</a>
+      </nav>
+      <div class="header__cart">
+        <a href="cart.html" class="cart-btn">Кошик (<span>0</span>)</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container page-header">
+    <ul class="breadcrumbs">
+      <li><a href="index.html">Головна</a></li>
+      <li><a href="catalog.html">Стелажі</a></li>
+      <li><span>Стелаж "Open Space"</span></li>
+    </ul>
+  </div>
+
+  <main class="container product-detail">
+    <div class="product-detail__grid">
+      <div class="product-gallery">
+        <div class="product-gallery__main" style="background-image: url('https://images.unsplash.com/photo-1594620302200-9a762244a156?auto=format&fit=crop&w=800&q=80');"></div>
+      </div>
+      <div class="product-info">
+        <span class="category-tag">Артикул: SH-204</span>
+        <h1 class="product-title">Стелаж "Open Space"</h1>
+        <div class="product-status"><span class="status status--in-stock">● В наявності</span></div>
+        <div class="product-price-box"><span class="price-current">6 500 грн</span></div>
+        <div class="product-options">
+          <div class="option-group">
+            <label for="size-select">Висота:</label>
+            <select id="size-select" class="option-select">
+              <option value="160 см">160 см (4 полиці)</option>
+              <option value="190 см" selected>190 см (5 полиць)</option>
+            </select>
+          </div>
+        </div>
+        <div class="product-actions">
+          <div class="quantity-counter">
+            <button type="button" class="qty-btn">-</button>
+            <input type="number" value="1" min="1" max="99">
+            <button type="button" class="qty-btn">+</button>
+          </div>
+          <button class="btn btn--lg">Додати в кошик</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script src="main.js"></script>
+</body>
+</html>
