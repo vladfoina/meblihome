@@ -1,295 +1,289 @@
-document.addEventListener('DOMContentLoaded', () => {
+/* --- 1. ФУНКЦІЯ СПЛИВАЮЧОГО ПОВІДОМЛЕННЯ (TOAST) --- */
+function showToast(message) {
+  let container = document.getElementById('toast-container');
+  
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+  }
 
-  /* 1. БЕЗПЕЧНИЙ МЕНЕДЖЕР КОШИКА */
-  const Cart = {
-    isAvailable() {
-      try {
-        const testKey = '__test__';
-        localStorage.setItem(testKey, testKey);
-        localStorage.removeItem(testKey);
-        return true;
-      } catch (e) {
-        return false;
-      }
-    },
+  const toast = document.createElement('div');
+  toast.className = 'toast toast--success';
+  toast.innerHTML = `<span>🛒</span> <span>${message}</span>`;
 
-    getItems() {
-      if (!this.isAvailable()) return this.fallbackCart || [];
-      return JSON.parse(localStorage.getItem('mebli_cart')) || [];
-    },
+  container.appendChild(toast);
 
-    saveItems(items) {
-      if (this.isAvailable()) {
-        localStorage.setItem('mebli_cart', JSON.stringify(items));
-      } else {
-        this.fallbackCart = items;
-      }
-      this.updateBadge();
-      renderCartPage();
-    },
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
 
-    add(product) {
-      const items = this.getItems();
-      const existingItem = items.find(item => item.id === product.id && item.color === product.color && item.size === product.size);
+/* --- 2. УПРАВЛІННЯ КОШИКОМ ТА ЛІЧИЛЬНИКАМИ --- */
+function initCartLogic() {
+  // Оновлення кількості у шапці з localStorage
+  function updateCartHeaderCount() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const cartBadge = document.querySelector('.cart-btn span');
+    if (cartBadge) {
+      cartBadge.textContent = totalCount;
+    }
+  }
+
+  // Обробка кнопок "+" та "-" на сторінці товару
+  const qtyInputs = document.querySelectorAll('.quantity-counter');
+  qtyInputs.forEach(counter => {
+    const minusBtn = counter.querySelector('.qty-btn:first-child');
+    const plusBtn = counter.querySelector('.qty-btn:last-child');
+    const input = counter.querySelector('input');
+
+    if (minusBtn && plusBtn && input) {
+      minusBtn.addEventListener('click', () => {
+        let val = parseInt(input.value) || 1;
+        if (val > 1) input.value = val - 1;
+      });
+
+      plusBtn.addEventListener('click', () => {
+        let val = parseInt(input.value) || 1;
+        if (val < 99) input.value = val + 1;
+      });
+    }
+  });
+
+  // Кліки по кнопках "Додати в кошик"
+  const addToCartBtns = document.querySelectorAll('.product-actions .btn, .product-card .btn');
+
+  addToCartBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      // Якщо це звичайне посилання "Детальніше" — пропускаємо
+      if (btn.getAttribute('href') && btn.getAttribute('href') !== '#') return;
+
+      e.preventDefault();
+
+      const titleEl = document.querySelector('.product-title') || btn.closest('.product-card')?.querySelector('h3');
+      const priceEl = document.querySelector('.price-current') || btn.closest('.product-card')?.querySelector('.price');
+      const qtyInput = document.querySelector('.quantity-counter input');
+
+      const title = titleEl ? titleEl.textContent.trim() : 'Товар';
+      const price = priceEl ? parseInt(priceEl.textContent.replace(/\D/g, '')) || 0 : 0;
+      const quantity = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
+
+      // Збереження в localStorage
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const existingItem = cart.find(item => item.title === title);
 
       if (existingItem) {
-        existingItem.quantity += product.quantity;
+        existingItem.quantity += quantity;
       } else {
-        items.push(product);
+        cart.push({ title, price, quantity });
       }
 
-      this.saveItems(items);
-      alert(`Товар "${product.name}" додано до кошика!`);
-    },
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCartHeaderCount();
 
-    remove(index) {
-      const items = this.getItems();
-      items.splice(index, 1);
-      this.saveItems(items);
-    },
+      // Показати повідомлення в контейнері замість alert
+      showToast(`"${title}" (${quantity} шт.) додано до кошика!`);
+    });
+  });
 
-    updateQuantity(index, newQty) {
-      const items = this.getItems();
-      if (newQty <= 0) {
-        this.remove(index);
+  updateCartHeaderCount();
+}
+
+/* --- 3. ФІЛЬТРАЦІЯ ТА СОРТУВАННЯ КАТАЛОГУ --- */
+function initCatalogLogic() {
+  const grid = document.querySelector('.product-grid');
+  if (!grid) return;
+
+  const cards = Array.from(grid.querySelectorAll('.product-card'));
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const sortSelect = document.getElementById('sort-select');
+
+  function getPrice(card) {
+    const priceEl = card.querySelector('.price, .price-current');
+    if (!priceEl) return 0;
+    return parseInt(priceEl.textContent.replace(/\s+/g, '').replace(/\D/g, '')) || 0;
+  }
+
+  function getName(card) {
+    const titleEl = card.querySelector('h3, .product-card__title');
+    return titleEl ? titleEl.textContent.trim() : '';
+  }
+
+  function applyFiltersAndSort() {
+    const activeBtn = document.querySelector('.filter-btn.active');
+    const filterValue = activeBtn ? (activeBtn.getAttribute('data-filter') || 'all').toLowerCase() : 'all';
+    const sortValue = sortSelect ? sortSelect.value : 'default';
+
+    cards.forEach(card => {
+      const tagEl = card.querySelector('.category-tag');
+      const tagText = tagEl ? tagEl.textContent.toLowerCase() : '';
+
+      if (filterValue === 'all' || tagText.includes(filterValue)) {
+        card.style.display = '';
       } else {
-        items[index].quantity = newQty;
-        this.saveItems(items);
+        card.style.display = 'none';
       }
-    },
+    });
 
-    updateBadge() {
-      const badges = document.querySelectorAll('.cart-btn span');
-      const items = this.getItems();
-      const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
-      badges.forEach(badge => badge.textContent = totalCount);
+    const visibleCards = cards.filter(card => card.style.display !== 'none');
+
+    visibleCards.sort((a, b) => {
+      if (sortValue === 'price-asc') return getPrice(a) - getPrice(b);
+      if (sortValue === 'price-desc') return getPrice(b) - getPrice(a);
+      if (sortValue === 'name-asc') return getName(a).localeCompare(getName(b), 'uk');
+      return 0;
+    });
+
+    visibleCards.forEach(card => grid.appendChild(card));
+  }
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      if (btn.tagName === 'A') return;
+
+      e.preventDefault();
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFiltersAndSort();
+    });
+  });
+
+  if (sortSelect) {
+    sortSelect.addEventListener('change', applyFiltersAndSort);
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const categoryParam = urlParams.get('category');
+
+  if (categoryParam) {
+    const decodedCategory = decodeURIComponent(categoryParam).toLowerCase();
+    const targetBtn = Array.from(filterBtns).find(btn => {
+      const filterAttr = btn.getAttribute('data-filter');
+      return filterAttr && filterAttr.toLowerCase() === decodedCategory;
+    });
+
+    if (targetBtn) {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      targetBtn.classList.add('active');
     }
-  };
+  }
 
-  Cart.fallbackCart = [];
-  Cart.updateBadge();
+  applyFiltersAndSort();
+}
 
-  /* 2. РЕНДЕРИНГ СТОРІНКИ КОШИКА */
-  function renderCartPage() {
-    const cartContainer = document.getElementById('cart-content');
-    if (!cartContainer) return;
+/* --- 4. ФОРМА КОНТАКТІВ --- */
+function initContactForm() {
+  const contactForm = document.getElementById('contact-form');
+  const formMessage = document.getElementById('form-message');
 
-    const items = Cart.getItems();
+  if (contactForm && formMessage) {
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
 
-    if (items.length === 0) {
-      cartContainer.innerHTML = `
-        <div class="cart-empty">
-          <p>Ваш кошик порожній 🛒</p>
-          <a href="catalog.html" class="btn">Перейти до каталогу</a>
-        </div>
-      `;
-      return;
-    }
+      formMessage.className = 'form-message form-message--success';
+      formMessage.textContent = 'Дякуємо! Ваше повідомлення успішно надіслано. Ми зв’яжемося з вами найближчим часом.';
+      formMessage.style.display = 'block';
 
-    let totalPrice = 0;
-    let rowsHtml = items.map((item, index) => {
-      const itemTotal = item.price * item.quantity;
-      totalPrice += itemTotal;
+      contactForm.reset();
 
-      return `
-        <tr>
-          <td>
-            <div class="cart-item__title">${item.name}</div>
-            <div class="cart-item__meta">Колір: ${item.color} | Розмір: ${item.size}</div>
-          </td>
-          <td>${item.price.toLocaleString('uk-UA')} грн</td>
-          <td>
-            <div class="quantity-counter">
-              <button type="button" class="qty-btn" data-action="decrease" data-index="${index}">-</button>
-              <input type="number" value="${item.quantity}" readonly>
-              <button type="button" class="qty-btn" data-action="increase" data-index="${index}">+</button>
-            </div>
-          </td>
-          <td><strong>${itemTotal.toLocaleString('uk-UA')} грн</strong></td>
-          <td>
-            <button class="btn-remove" data-index="${index}" title="Видалити">&times;</button>
-          </td>
-        </tr>
-      `;
-    }).join('');
+      setTimeout(() => {
+        formMessage.style.display = 'none';
+      }, 5000);
+    });
+  }
+}
 
-    cartContainer.innerHTML = `
-      <div class="cart-table-wrapper">
-        <table class="cart-table">
-          <thead>
-            <tr>
-              <th>Товар</th>
-              <th>Ціна</th>
-              <th>Кількість</th>
-              <th>Сума</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rowsHtml}
-          </tbody>
-        </table>
+/* --- ІНІЦІАЛІЗАЦІЯ ПІСЛЯ ЗАВАНТАЖЕННЯ DOM --- */
+function main() {
+  initCartLogic();
+  initCatalogLogic();
+  initContactForm();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', main);
+} else {
+  main();
+}
+/* --- РЕНДЕР СТОРІНКИ КОШИКА --- */
+function renderCartPage() {
+  const container = document.getElementById('cart-items-container');
+  const cartWrapper = document.getElementById('cart-wrapper');
+  const cartEmpty = document.getElementById('cart-empty');
+  const totalPriceEl = document.getElementById('cart-total-price');
+  const totalCountEl = document.getElementById('cart-total-count');
+
+  if (!container) return; // Якщо ми не на сторінці cart.html — виходимо
+
+  let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+  if (cart.length === 0) {
+    if (cartWrapper) cartWrapper.style.display = 'none';
+    if (cartEmpty) cartEmpty.style.display = 'block';
+    return;
+  }
+
+  if (cartWrapper) cartWrapper.style.display = 'grid';
+  if (cartEmpty) cartEmpty.style.display = 'none';
+
+  container.innerHTML = '';
+  let totalPrice = 0;
+  let totalCount = 0;
+
+  cart.forEach((item, index) => {
+    const itemTotal = item.price * item.quantity;
+    totalPrice += itemTotal;
+    totalCount += item.quantity;
+
+    const itemEl = document.createElement('div');
+    itemEl.className = 'cart-item';
+    itemEl.innerHTML = `
+      <div class="cart-item__info">
+        <h4>${item.title}</h4>
+        <div class="cart-item__price">${item.price.toLocaleString()} грн × ${item.quantity} шт. = <strong>${itemTotal.toLocaleString()} грн</strong></div>
       </div>
-      <div class="cart-summary">
-        <div class="cart-total">Всього: <span>${totalPrice.toLocaleString('uk-UA')} грн</span></div>
-        <button class="btn btn--lg" onclick="alert('Дякуємо за замовлення!')">Оформити замовлення</button>
+      <div class="cart-item__actions">
+        <button class="remove-btn" data-index="${index}" title="Видалити">🗑️</button>
       </div>
     `;
 
-    cartContainer.querySelectorAll('.btn-remove').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const index = parseInt(btn.getAttribute('data-index'));
-        Cart.remove(index);
-      });
-    });
+    container.appendChild(itemEl);
+  });
 
-    cartContainer.querySelectorAll('.qty-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const index = parseInt(btn.getAttribute('data-index'));
-        const action = btn.getAttribute('data-action');
-        const currentQty = items[index].quantity;
+  if (totalPriceEl) totalPriceEl.textContent = `${totalPrice.toLocaleString()} грн`;
+  if (totalCountEl) totalCountEl.textContent = `${totalCount} шт.`;
 
-        if (action === 'increase') {
-          Cart.updateQuantity(index, currentQty + 1);
-        } else if (action === 'decrease') {
-          Cart.updateQuantity(index, currentQty - 1);
-        }
-      });
-    });
-  }
-
-  renderCartPage();
-
-  /* 3. ІНТЕРАКТИВ НА СТОРІНКАХ ТОВАРІВ */
-  const productSection = document.querySelector('.product-detail');
-  
-  if (productSection) {
-    const mainImg = document.querySelector('.product-gallery__main');
-    const thumbs = document.querySelectorAll('.thumb');
-
-    thumbs.forEach(thumb => {
-      thumb.addEventListener('click', function() {
-        thumbs.forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-        const bgUrl = getComputedStyle(this).backgroundImage;
-        if (mainImg) mainImg.style.backgroundImage = bgUrl;
-      });
-    });
-
-    const colorBtns = document.querySelectorAll('.color-btn');
-    colorBtns.forEach(btn => {
-      btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        colorBtns.forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-      });
-    });
-
-    const qtyInput = document.querySelector('.quantity-counter input');
-    const qtyBtns = document.querySelectorAll('.qty-btn');
-
-    qtyBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (!qtyInput) return;
-        let currentVal = parseInt(qtyInput.value) || 1;
-        
-        if (btn.textContent.trim() === '+') {
-          currentVal++;
-        } else if (btn.textContent.trim() === '-' && currentVal > 1) {
-          currentVal--;
-        }
-        qtyInput.value = currentVal;
-      });
-    });
-
-    const addToCartBtn = document.querySelector('.product-actions .btn--lg');
-    if (addToCartBtn) {
-      addToCartBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        
-        const activeColorBtn = document.querySelector('.color-btn.active');
-        const sizeSelect = document.getElementById('size-select');
-        const titleEl = document.querySelector('.product-title');
-        const priceEl = document.querySelector('.price-current');
-        const rawPrice = priceEl ? priceEl.textContent.replace(/\D/g, '') : '0';
-
-        Cart.add({
-          id: titleEl ? titleEl.textContent.trim().toLowerCase().replace(/\s+/g, '-') : 'prod',
-          name: titleEl ? titleEl.textContent.trim() : 'Товар',
-          price: parseInt(rawPrice) || 0,
-          color: activeColorBtn ? (activeColorBtn.getAttribute('title') || 'Обраний колір') : 'Стандарт',
-          size: sizeSelect ? sizeSelect.value : 'Стандарт',
-          quantity: qtyInput ? (parseInt(qtyInput.value) || 1) : 1
-        });
-      });
-    }
-  }
-
-  function initCatalogLogic() {
-    const grid = document.querySelector('.catalog-page .product-grid');
-    if (!grid) return;
-
-    const cards = Array.from(grid.querySelectorAll('.product-card'));
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const sortSelect = document.getElementById('sort-select');
-
-    function getPrice(card) {
-      const priceEl = card.querySelector('.price, .price-current');
-      return priceEl ? parseInt(priceEl.textContent.replace(/\D/g, ''), 10) || 0 : 0;
-    }
-
-    function getName(card) {
-      const titleEl = card.querySelector('h3, .product-card__title');
-      return titleEl ? titleEl.textContent.trim() : '';
-    }
-
-    function applyFiltersAndSort() {
-      const activeBtn = document.querySelector('.filter-btn.active');
-      const filterValue = activeBtn ? (activeBtn.getAttribute('data-filter') || 'all').toLowerCase() : 'all';
-      const sortValue = sortSelect ? sortSelect.value : 'default';
-
-      cards.forEach(card => {
-        const tag = card.querySelector('.category-tag');
-        const tagText = tag ? tag.textContent.toLowerCase() : '';
-        card.style.display = filterValue === 'all' || tagText.includes(filterValue) ? '' : 'none';
-      });
-
-      const visibleCards = cards.filter(card => card.style.display !== 'none');
-      visibleCards.sort((a, b) => {
-        if (sortValue === 'price-asc') return getPrice(a) - getPrice(b);
-        if (sortValue === 'price-desc') return getPrice(b) - getPrice(a);
-        if (sortValue === 'name-asc') return getName(a).localeCompare(getName(b), 'uk');
-        return 0;
-      });
-      visibleCards.forEach(card => grid.appendChild(card));
-    }
-
-    filterBtns.forEach(btn => {
-      if (btn.tagName === 'A') return;
-      btn.addEventListener('click', event => {
-        event.preventDefault();
-        filterBtns.forEach(filterBtn => filterBtn.classList.remove('active'));
-        btn.classList.add('active');
-        applyFiltersAndSort();
-      });
-    });
-
-    if (sortSelect) sortSelect.addEventListener('change', applyFiltersAndSort);
-
-    const categoryParam = new URLSearchParams(window.location.search).get('category');
-    if (categoryParam) {
-      const targetBtn = Array.from(filterBtns).find(btn =>
-        btn.getAttribute('data-filter')?.toLowerCase() === decodeURIComponent(categoryParam).toLowerCase()
-      );
-      if (targetBtn) {
-        filterBtns.forEach(filterBtn => filterBtn.classList.remove('active'));
-        targetBtn.classList.add('active');
+  // Обробка видалення елемента з кошика
+  const removeBtns = container.querySelectorAll('.remove-btn');
+  removeBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = parseInt(e.target.getAttribute('data-index'));
+      cart.splice(idx, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      renderCartPage();
+      
+      // Оновлюємо бейдж кількості у шапці
+      const cartBadge = document.querySelector('.cart-btn span');
+      if (cartBadge) {
+        const newCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartBadge.textContent = newCount;
       }
-    }
+    });
+  });
+}
 
-    applyFiltersAndSort();
-  }
-
+/* Онови функцію main() у кінець main.js, додавши туди виклик renderCartPage(): */
+function main() {
+  initCartLogic();
   initCatalogLogic();
-});
+  initContactForm();
+  renderCartPage(); // <--- Додано цей рядок
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', main);
+} else {
+  main();
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Контакти — MebliHome</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Шапка -->
+  <header class="header">
+    <div class="container header__wrapper">
+      <a href="index.html" class="logo">Mebli<span>Home</span></a>
+      <nav class="nav">
+        <a href="index.html">Головна</a>
+        <a href="catalog.html">Каталог</a>
+        <a href="about.html">Про нас</a>
+        <a href="contacts.html" class="active">Контакти</a>
+      </nav>
+      <div class="header__cart">
+        <a href="cart.html" class="cart-btn">Кошик (<span>0</span>)</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Хлібні крихти -->
+  <div class="container page-header">
+    <ul class="breadcrumbs">
+      <li><a href="index.html">Головна</a></li>
+      <li><span>Контакти</span></li>
+    </ul>
+    <h1 class="page-title">Зв'яжіться з нами</h1>
+  </div>
+
+  <!-- Контент -->
+  <main class="container page-content">
+    <div class="contacts-grid">
+      
+      <!-- Інформація -->
+      <div class="contacts-info">
+        <div class="contact-item">
+          <h3>📍 Адреса шоуруму</h3>
+          <p>м. Київ, вул. Хрещатик, 25</p>
+        </div>
+        <div class="contact-item">
+          <h3>📞 Телефони</h3>
+          <p><a href="tel:+380800300100">0 800 300 100</a> (безкоштовно по Україні)</p>
+          <p><a href="tel:+380442223344">+38 (044) 222-33-44</a></p>
+        </div>
+        <div class="contact-item">
+          <h3>✉️ Електронна пошта</h3>
+          <p><a href="mailto:info@meblihome.ua">info@meblihome.ua</a></p>
+        </div>
+        <div class="contact-item">
+          <h3>⏰ Графік роботи</h3>
+          <p>Пн-Пт: 09:00 — 20:00</p>
+          <p>Сб-Нд: 10:00 — 18:00</p>
+        </div>
+      </div>
+
+      <!-- Форма зворотного зв'язку -->
+      <!-- Форма зворотного зв'язку -->
+      <div class="contact-form-wrapper">
+        <h2>Написати нам</h2>
+        
+        <!-- Контейнер для повідомлення -->
+        <div id="form-message" class="form-message" style="display: none;"></div>
+
+        <form id="contact-form" class="contact-form">
+          <div class="form-group">
+            <label for="name">Ваше ім'я</label>
+            <input type="text" id="name" required placeholder="Олександр">
+          </div>
+          <div class="form-group">
+            <label for="phone">Номер телефону</label>
+            <input type="tel" id="phone" required placeholder="+380 (99) 000-00-00">
+          </div>
+          <div class="form-group">
+            <label for="message">Повідомлення</label>
+            <textarea id="message" rows="4" placeholder="Ваше запитання..."></textarea>
+          </div>
+          <button type="submit" class="btn btn--lg">Надіслати</button>
+        </form>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__wrapper">
+      <a href="index.html" class="logo">Mebli<span>Home</span></a>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

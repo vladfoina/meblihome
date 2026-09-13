@@ -8,15 +8,14 @@
 </head>
 <body>
 
-  <!-- Шапка -->
   <header class="header">
     <div class="container header__wrapper">
       <a href="index.html" class="logo">Mebli<span>Home</span></a>
       <nav class="nav">
         <a href="index.html">Головна</a>
         <a href="catalog.html">Каталог</a>
-        <a href="#">Про нас</a>
-        <a href="#">Контакти</a>
+        <a href="about.html">Про нас</a>
+        <a href="contacts.html">Контакти</a>
       </nav>
       <div class="header__cart">
         <a href="cart.html" class="cart-btn active">Кошик (<span>0</span>)</a>
@@ -24,34 +23,45 @@
     </div>
   </header>
 
-  <!-- Хлібні крихти та заголовок -->
   <div class="container page-header">
     <ul class="breadcrumbs">
       <li><a href="index.html">Головна</a></li>
       <li><span>Кошик</span></li>
     </ul>
-    <h1>Ваш кошик</h1>
+    <h1 class="page-title">Ваш кошик</h1>
   </div>
 
-  <!-- Контент кошика -->
-  <main class="container cart-page">
-    <div id="cart-content">
-      <!-- Тут буде таблиця з товарами або повідомлення про порожній кошик -->
+  <main class="container page-content">
+    <!-- Повідомлення про порожній кошик -->
+    <div id="cart-empty" class="cart-empty" style="display: none;">
+      <p>Ваш кошик порожній 🛒</p>
+      <a href="catalog.html" class="btn btn--lg">Перейти до каталогу</a>
+    </div>
+
+    <!-- Основний блок із списками товарів -->
+    <div id="cart-wrapper" class="cart-wrapper">
+      <div class="cart-items" id="cart-items-container">
+        <!-- Товари будуть згенеровані через JS -->
+      </div>
+
+      <div class="cart-summary">
+        <h3>Підсумок замовлення</h3>
+        <div class="summary-row">
+          <span>Всього товарів:</span>
+          <span id="cart-total-count">0</span>
+        </div>
+        <div class="summary-row summary-row--total">
+          <span>До сплати:</span>
+          <span id="cart-total-price">0 грн</span>
+        </div>
+        <button class="btn btn--lg btn--full" onclick="alert('Дякуємо за замовлення! Менеджер зв\'яжеться з вами.')">Оформити замовлення</button>
+      </div>
     </div>
   </main>
 
-  <!-- Футер -->
   <footer class="footer">
     <div class="container footer__wrapper">
-      <div>
-        <a href="index.html" class="logo">Mebli<span>Home</span></a>
-        <p>Якісні меблі для вашого дому.</p>
-      </div>
-      <div class="contacts">
-        <h4>Контакти</h4>
-        <p>Телефон: +38 (097) 000-00-00</p>
-        <p>Адреса: м. Київ, вул. Меблева, 12</p>
-      </div>
+      <a href="index.html" class="logo">Mebli<span>Home</span></a>
     </div>
   </footer>
 
